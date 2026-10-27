@@ -652,7 +652,7 @@ function shareGrid() {
 }
 function shareText() {
   const head = game.mode === 'daily' ? `Daily Simple Group ${game.day + 1}` : 'Daily Simple Group (practice)';
-  return `${head} ${solved() ? game.guesses.length : 'X'}/${MAX}\n${shareGrid()}\ncfsg.axiommath.ai`;
+  return `${head} ${solved() ? game.guesses.length : 'X'}/${MAX}\n${shareGrid()}\nandrewp2.github.io/daily-simple-group`;
 }
 function copyResult() {
   const text = shareText();
