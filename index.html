@@ -71,7 +71,7 @@
   .btn.primary:hover { filter: brightness(1.08); }
   .btn:disabled { opacity: 0.45; cursor: default; filter: none; }
 
-  main { display: grid; grid-template-columns: minmax(0, 580px) minmax(0, 1fr); gap: 36px; align-items: start; }
+  main { display: grid; grid-template-columns: minmax(0, 600px) minmax(0, 1fr); gap: 36px; align-items: start; }
   /* On wide screens the guesses and the selected group stay pinned in view while the table scrolls beside them. */
   @media (min-width: 961px) {
     .play { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; scrollbar-width: thin; padding: 14px 6px 28px 0; margin-top: -14px; }
@@ -83,13 +83,13 @@
 
   /* Guesses, laid out as a table */
   .board { display: grid; }
-  .grow { display: grid; grid-template-columns: minmax(4.8rem, auto) minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.2fr) repeat(6, 1.7rem); gap: 6px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .grow { display: grid; grid-template-columns: 5.4rem 5.6rem 7rem 6.6rem repeat(6, 1.6rem); gap: 5px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--rule); }
   .ghdr { font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 0; border-bottom: 1px solid var(--rule-strong); }
   .guess { width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; }
   .guess:hover { background: var(--raise); }
   .slot { color: var(--faint); font-size: 14px; min-height: 36px; }
-  .gsym { font: 400 20px/1.1 var(--serif); }
-  .tile { justify-self: start; border-radius: 2px; padding: 2px 7px; font: 400 15px/1.35 var(--serif); font-variant-numeric: lining-nums tabular-nums; background: var(--miss); color: var(--on-miss); }
+  .gsym { font: 400 18px/1.1 var(--serif); white-space: nowrap; }
+  .tile { justify-self: start; border-radius: 2px; padding: 2px 6px; font: 400 14px/1.35 var(--serif); white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; background: var(--miss); color: var(--on-miss); }
   .tile small { display: none; font: 600 12px var(--sans); margin-right: 5px; opacity: 0.75; }
   .tile.hit { background: var(--hit); color: var(--on-hit); }
   .tile.near { background: var(--near); color: var(--on-near); }
@@ -129,7 +129,8 @@
     #pick .fact { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   }
 
-  #ended { margin-top: 18px; padding-top: 12px; border-top: 2px solid var(--ink); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  #ended { margin-top: 18px; padding-top: 12px; border-top: 2px solid var(--ink); display: grid; gap: 12px; justify-items: start; }
+  #ended .grid { margin: 0; font: 22px/1.2 ui-monospace, monospace; letter-spacing: 1px; }
   #result { display: grid; gap: 14px 36px; }
   #result .rcol { display: grid; gap: 12px; align-content: start; min-width: 0; }
   @media (min-width: 860px) { #result { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } #result .viz canvas { height: 300px; } }
@@ -151,10 +152,9 @@
   .about a { color: var(--accent); }
 
   /* Table of groups */
-  .table { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 32px; }
+  .table { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px 32px; }
   .sect.wide { grid-column: 1 / -1; }
-  .sect h3 { font: 400 22px/1.2 var(--serif); margin: 0 0 2px; }
-  .sect > p { color: var(--muted); margin: 0 0 6px; max-width: 120ch; font-size: 15px; }
+  .sect h3 { font: 400 20px/1.2 var(--serif); margin: 0 0 2px; }
   /* Each family block is as wide as its cells and the blocks pack into rows, so wide screens need fewer rows. */
   .fams { display: flex; flex-wrap: wrap; gap: 0 28px; }
   .fams > .fam { flex: 0 1 auto; min-width: 0; max-width: 100%; }
@@ -164,6 +164,13 @@
   .chips { display: flex; flex-wrap: wrap; gap: 4px; }
   .chip { min-width: 48px; min-height: 36px; padding: 3px 8px; border: 1px solid var(--rule-strong); border-radius: 0; background: var(--bg); cursor: pointer; font: 400 16px/1.2 var(--serif); }
   .chip:hover { background: var(--raise); }
+  /* Smaller cells on mid-size screens, so the whole table still fits without scrolling. */
+  @media (max-width: 1600px) and (min-width: 961px) {
+    .chip { min-width: 40px; min-height: 30px; padding: 1px 6px; font-size: 15px; }
+    .fam { padding: 5px 0; }
+    .table { gap: 10px 28px; }
+    .sect h3 { font-size: 18px; }
+  }
   .chip.sel { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
   .chip.used { color: var(--faint); border-color: var(--rule); text-decoration: line-through; }
   .chip.answer { background: var(--hit); border-color: var(--hit); color: var(--on-hit); text-decoration: none; }
@@ -395,7 +402,7 @@ const sup = (n) => String(n).split('').map((d) => SUP[d]).join('');
 const pp = ([p, e]) => (e > 1 ? `${p}${sup(e)}` : `${p}`);
 function shortOrder(n) {
   const s = n.toString();
-  if (s.length <= 12) return n.toLocaleString('en-US');
+  if (s.length <= 9) return n.toLocaleString('en-US');
   let m = Math.round(Number(s.slice(0, 3)) / 10) / 10, e = s.length - 1;
   if (m >= 10) { m = 1; e += 1; }
   return `${m.toFixed(1)} × 10${sup(e)}`;
@@ -505,7 +512,9 @@ function renderTable() {
   for (const s of SECTIONS) {
     // Sections with several families span the full width and lay their families out side by side.
     const wide = s.fams.length > 1, sect = el('div', wide ? 'sect wide' : 'sect'), fams = el('div', wide ? 'fams' : null);
-    sect.append(el('h3', null, s.title), el('p', null, s.text), fams);
+    const h = el('h3', null, s.title);
+    h.title = s.text;
+    sect.append(h, fams);
     for (const [fam, label] of s.fams) {
       const row = el('div', 'fam');
       if (label) row.appendChild(el('div', 'fname', label));
@@ -614,7 +623,7 @@ function renderResult() {
   const practice = el('button', 'btn', game.mode === 'daily' ? 'Play a practice round' : 'Another practice round'); practice.type = 'button';
   practice.addEventListener('click', () => { closeResult(); newPractice(); renderAll(); });
   row.append(share, practice);
-  if (game.mode === 'daily') { const cd = el('span', 'label'); cd.id = 'countdown'; row.appendChild(cd); tickCountdown(); }
+  if (game.mode === 'daily') { row.appendChild(el('span', 'label countdown')); tickCountdown(); }
   right.appendChild(row);
   const about = el('div', 'about');
   about.innerHTML = `<svg viewBox="0 0 548 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Axiom"><path d="M84 108H156L180 180H60L84 108Z" fill="currentColor"/><path d="M102 72L156 84L180 156L78 144L102 72Z" fill="#99BBFF"/><path d="M129 24L156 60L180 132L105 96L129 24Z" fill="#C2D6FF"/><path d="M241.812 152.872C239.208 152.872 237.72 151.291 237.72 148.966C237.72 148.129 237.72 147.292 238.65 144.688L256.227 94.189C258.18 88.609 259.947 87.028 264.318 87.028H264.783C269.154 87.028 270.921 88.609 272.874 94.189L290.544 144.595C291.474 147.199 291.474 148.036 291.474 148.78C291.474 151.198 289.986 152.872 287.196 152.872C285.15 152.872 283.383 151.849 282.174 148.408L277.71 135.202H251.112L246.741 148.408C245.532 151.942 243.765 152.872 241.812 152.872ZM253.623 127.762H275.199L264.318 95.398L253.623 127.762ZM301.911 152.965C299.958 152.965 298.191 151.384 298.191 149.338C298.191 148.036 298.656 146.548 300.144 144.688L312.699 128.692L301.167 114.091C299.586 112.138 299.214 110.836 299.214 109.627C299.214 107.488 300.888 105.628 303.12 105.628C304.98 105.628 306.468 106.651 308.235 109.069L318.372 122.926L328.788 108.976C330.555 106.558 332.136 105.535 333.903 105.535C335.856 105.535 337.623 107.023 337.623 109.255C337.623 110.464 337.158 111.859 335.391 114.091L323.952 128.692L336.414 144.595C337.902 146.455 338.367 147.664 338.367 148.873C338.367 151.198 336.693 152.965 334.461 152.965C332.601 152.965 331.02 152.035 328.788 148.966L318.279 134.551L307.491 148.966C305.073 152.128 303.585 152.965 301.911 152.965ZM351.298 152.872C348.601 152.872 347.02 151.105 347.02 148.036V110.464C347.02 107.395 348.601 105.628 351.298 105.628C354.088 105.628 355.576 107.395 355.576 110.464V148.036C355.576 151.105 354.088 152.872 351.298 152.872ZM351.298 98.839C348.136 98.839 345.625 96.328 345.625 93.259C345.625 90.19 348.136 87.865 351.298 87.865C354.46 87.865 356.878 90.19 356.878 93.259C356.878 96.328 354.46 98.839 351.298 98.839ZM386.82 153.895C372.963 153.895 364.221 143.2 364.221 129.25C364.221 115.3 372.963 104.605 386.82 104.605C400.863 104.605 409.605 115.3 409.605 129.25C409.605 143.2 400.863 153.895 386.82 153.895ZM386.82 146.083C395.655 146.083 400.863 139.108 400.863 129.25C400.863 119.392 395.655 112.417 386.82 112.417C378.078 112.417 372.963 119.392 372.963 129.25C372.963 139.108 378.078 146.083 386.82 146.083ZM422.273 152.872C419.576 152.872 417.995 151.105 417.995 148.036V110.371C417.995 107.302 419.576 105.535 422.273 105.535C424.97 105.535 426.551 107.302 426.551 110.371V113.905C429.062 107.86 433.526 104.605 439.664 104.605C445.895 104.605 450.638 108.139 452.777 113.998C454.823 108.232 459.659 104.605 466.262 104.605C475.748 104.605 481.328 111.301 481.328 122.089V148.036C481.328 151.105 479.747 152.872 477.05 152.872C474.26 152.872 472.772 151.105 472.772 148.036V123.298C472.772 115.765 469.703 112.138 463.937 112.138C458.171 112.138 453.986 116.416 453.893 122.461V148.036C453.893 151.105 452.405 152.872 449.708 152.872C447.011 152.872 445.43 151.105 445.43 148.036V122.461C445.43 115.765 442.082 112.138 436.409 112.138C430.829 112.138 426.644 117.16 426.551 124.135V148.036C426.551 151.105 425.063 152.872 422.273 152.872Z" fill="currentColor"/></svg>`;
@@ -700,11 +709,9 @@ function toast(text) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2200);
 }
 function tickCountdown() {
-  const cd = document.getElementById('countdown');
-  if (!cd) return;
   const now = new Date(), next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
   const s = Math.max(0, Math.floor((next - now) / 1000));
-  cd.textContent = `Next puzzle in ${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  for (const cd of document.querySelectorAll('.countdown')) cd.textContent = `Next puzzle in ${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 setInterval(() => {
   tickCountdown();
@@ -1391,10 +1398,15 @@ function renderEnded() {
   ended.hidden = !over();
   if (!over()) return;
   ended.replaceChildren();
-  const b = el('button', 'btn primary', 'Show the answer');
-  b.type = 'button';
-  b.addEventListener('click', openResult);
-  ended.append(el('span', null, solved() ? `Solved in ${game.guesses.length} of ${MAX}.` : 'Out of guesses.'), b);
+  const show = el('button', 'btn primary', 'Show the answer'), copy = el('button', 'btn', 'Copy result');
+  show.type = copy.type = 'button';
+  show.addEventListener('click', openResult);
+  copy.addEventListener('click', copyResult);
+  const row = el('div', 'row');
+  row.append(show, copy);
+  if (game.mode === 'daily') row.appendChild(el('span', 'label countdown'));
+  ended.append(el('div', null, solved() ? `Solved in ${game.guesses.length} of ${MAX}.` : 'Out of guesses.'), el('pre', 'grid', shareGrid()), row);
+  tickCountdown();
 }
 document.getElementById('resultClose').addEventListener('click', closeResult);
 resultModal.addEventListener('click', (e) => { if (e.target === resultModal) closeResult(); });
