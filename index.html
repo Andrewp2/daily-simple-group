@@ -71,7 +71,7 @@
   .btn.primary:hover { filter: brightness(1.08); }
   .btn:disabled { opacity: 0.45; cursor: default; filter: none; }
 
-  main { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 36px; align-items: start; }
+  main { display: grid; grid-template-columns: minmax(0, 580px) minmax(0, 1fr); gap: 36px; align-items: start; }
   /* On wide screens the guesses and the selected group stay pinned in view while the table scrolls beside them. */
   @media (min-width: 961px) {
     .play { position: sticky; top: 0; max-height: 100vh; overflow-y: auto; scrollbar-width: thin; padding: 14px 6px 28px 0; margin-top: -14px; }
@@ -83,7 +83,7 @@
 
   /* Guesses, laid out as a table */
   .board { display: grid; }
-  .grow { display: grid; grid-template-columns: minmax(5.8rem, auto) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+  .grow { display: grid; grid-template-columns: minmax(4.8rem, auto) minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.2fr) repeat(6, 1.7rem); gap: 6px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--rule); }
   .ghdr { font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 0; border-bottom: 1px solid var(--rule-strong); }
   .guess { width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; }
   .guess:hover { background: var(--raise); }
@@ -94,11 +94,13 @@
   .tile.hit { background: var(--hit); color: var(--on-hit); }
   .tile.near { background: var(--near); color: var(--on-near); }
   /* Prime factors take a second line under the kind, family and order clues. */
-  .primes { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+  .ptile, .pcol { justify-self: stretch; text-align: center; padding-inline: 0; }
+  .ptile.absent { text-decoration: line-through; text-decoration-thickness: 1.5px; }
   @media (max-width: 620px) {
     .grow { display: flex; flex-wrap: wrap; gap: 6px; }
     .grow.ghdr { display: none; }
     .grow > .gsym { width: 100%; }
+    .ptile { min-width: 1.7rem; }
     .tile small { display: inline; }
   }
   @media (prefers-reduced-motion: no-preference) {
@@ -240,7 +242,7 @@
         <p>Each guess compares your group with the answer. You get 6 guesses, and a new puzzle starts at midnight.</p>
         <div class="example" id="example"></div>
         <div class="legend">
-          <div><span class="sw" style="background: var(--hit)"></span>Matches the answer. For a prime, the answer's order is also divisible by it.</div>
+          <div><span class="sw" style="background: var(--hit)"></span>Matches the answer. In a prime column, both orders are divisible by that prime, or neither is. A struck-through number means your guess's order is not divisible by it.</div>
           <div><span class="sw" style="background: var(--near)"></span>Close: the answer's order is within a factor of 10 of yours.</div>
           <div><span class="sw" style="background: var(--miss)"></span>Does not match. An arrow on the order says whether the answer is bigger or smaller.</div>
         </div>
@@ -437,6 +439,7 @@ const solved = () => game.guesses.includes(game.answer);
 const over = () => solved() || game.guesses.length >= MAX;
 
 // ------------------------------------------------------------------ clues
+const PRIME_COLUMNS = [2, 3, 5, 7, 11, 13];
 function compare(guess, answer) {
   const G = BY_ID[guess], A = BY_ID[answer];
   const kind = G.kind === A.kind ? 'hit' : 'miss';
@@ -448,10 +451,10 @@ function compare(guess, answer) {
     const [hi, lo] = A.order > G.order ? [A.order, G.order] : [G.order, A.order];
     if (hi <= lo * 10n) order = 'near';
   }
-  // Each prime in the guess's order only says whether the answer's order has it too. Powers and the answer's other
-  // primes stay hidden; with them the factorization identified the answer almost at once.
-  const answerPrimes = new Set(A.f.map(([p]) => p));
-  const primes = G.f.map(([p]) => ({ text: String(p), state: answerPrimes.has(p) ? 'hit' : 'miss' }));
+  // One column per small prime, so every row has the same shape. A column matches when both orders are divisible by
+  // that prime or both are not; powers and larger primes stay hidden.
+  const has = (X, q) => X.f.some(([pr]) => pr === q);
+  const primes = PRIME_COLUMNS.map((q) => ({ prime: q, guessHas: has(G, q), state: has(G, q) === has(A, q) ? 'hit' : 'miss' }));
   return { kind, fam, order, dir, primes };
 }
 
@@ -466,14 +469,18 @@ function tile(state, label, value) {
 // One row of the guess table. The small labels inside tiles only show on phones, where the header row is hidden.
 function guessRow(id, answer, tag) {
   const G = BY_ID[id], c = compare(id, answer), row = el(tag, 'grow guess');
-  const primes = el('span', 'primes');
-  c.primes.forEach((p) => primes.appendChild(tile(p.state, null, p.text)));
-  row.append(el('span', 'gsym', G.sym), tile(c.kind, 'Kind', KINDS[G.kind].label), tile(c.fam, 'Family', FAMS[G.fam]), tile(c.order, 'Order', `${shortOrder(G.order)} ${c.dir}`.trim()), primes);
+  row.append(el('span', 'gsym', G.sym), tile(c.kind, 'Kind', KINDS[G.kind].label), tile(c.fam, 'Family', FAMS[G.fam]), tile(c.order, 'Order', `${shortOrder(G.order)} ${c.dir}`.trim()));
+  for (const pr of c.primes) {
+    const t = tile(`${pr.state} ptile${pr.guessHas ? '' : ' absent'}`, null, String(pr.prime));
+    t.title = `${G.sym}'s order is ${pr.guessHas ? '' : 'not '}divisible by ${pr.prime}. ${pr.state === 'hit' ? 'Same' : 'Different'} for the answer.`;
+    row.appendChild(t);
+  }
   return row;
 }
 function headerRow() {
   const h = el('div', 'grow ghdr');
   for (const t of ['Group', 'Kind', 'Family', 'Order']) h.appendChild(el('span', null, t));
+  for (const q of PRIME_COLUMNS) h.appendChild(el('span', 'pcol', String(q)));
   return h;
 }
 function renderBoard() {
@@ -599,7 +606,7 @@ function renderResult() {
     right.appendChild(st);
   }
   const preview = el('div', 'share');
-  preview.append(el('pre', null, shareGrid()), el('p', null, 'Each row is one guess: kind, family and order, then one square per prime. Copy it to share without giving away the answer.'));
+  preview.append(el('pre', null, shareGrid()), el('p', null, 'Each row is one guess, in the same order as the table: kind, family, order, then the primes 2, 3, 5, 7, 11 and 13. Copy it to share without giving away the answer.'));
   right.appendChild(preview);
   const row = el('div', 'row');
   const share = el('button', 'btn primary', 'Copy result'); share.type = 'button';
@@ -666,7 +673,7 @@ const SQ = { hit: '🟩', near: '🟨', miss: '⬛' };
 function shareGrid() {
   return game.guesses.map((id) => {
     const c = compare(id, game.answer);
-    return [c.kind, c.fam, c.order].map((st) => SQ[st]).join('') + ' ' + c.primes.map((pr) => SQ[pr.state]).join('');
+    return [c.kind, c.fam, c.order, ...c.primes.map((pr) => pr.state)].map((st) => SQ[st]).join('');
   }).join('\n');
 }
 function shareText() {
@@ -1408,7 +1415,7 @@ document.getElementById('modeBtn').addEventListener('click', () => { if (game.mo
 {
   // A worked example: guessing A₇ when the answer is M₁₁.
   const ex = document.getElementById('example');
-  ex.append(headerRow(), guessRow('A7', 'M11', 'div'), el('p', null, 'If you guess A₇ and the answer is M₁₁, you learn that the answer is not alternating. Its order is bigger, but by less than a factor of 10. Its order is divisible by 2, 3 and 5, but not by 7.'));
+  ex.append(headerRow(), guessRow('A7', 'M11', 'div'), el('p', null, 'If you guess A₇ and the answer is M₁₁, you learn that the answer is not alternating. Its order is bigger, but by less than a factor of 10. Like A₇’s, its order is divisible by 2, 3 and 5 and not by 13. Unlike A₇’s, it is divisible by 11 and not by 7.'));
 }
 
 renderTable();
