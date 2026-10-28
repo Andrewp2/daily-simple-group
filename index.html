@@ -284,6 +284,10 @@ const GROUPS = [
   g('Z3', 'ℤ₃', 'Cyclic group of order 3', 'cyc', 'cyclic', [[3, 1]], 'The rotations of a triangle. Cyclic groups of prime order are the only simple groups where doing two moves in either order always gives the same result.'),
   g('Z5', 'ℤ₅', 'Cyclic group of order 5', 'cyc', 'cyclic', [[5, 1]], 'The rotations of a pentagon. There is one of these groups for every prime number.'),
   g('Z7', 'ℤ₇', 'Cyclic group of order 7', 'cyc', 'cyclic', [[7, 1]], 'The rotations of a heptagon. There is one of these groups for every prime number.'),
+  g('Z11', 'ℤ₁₁', 'Cyclic group of order 11', 'cyc', 'cyclic', [[11, 1]], 'The rotations of a regular 11-sided polygon. There is one of these groups for every prime number.'),
+  g('Z13', 'ℤ₁₃', 'Cyclic group of order 13', 'cyc', 'cyclic', [[13, 1]], 'The rotations of a regular 13-sided polygon. There is one of these groups for every prime number.'),
+  g('Z17', 'ℤ₁₇', 'Cyclic group of order 17', 'cyc', 'cyclic', [[17, 1]], 'The rotations of a regular 17-sided polygon. There is one of these groups for every prime number.'),
+  g('Z19', 'ℤ₁₉', 'Cyclic group of order 19', 'cyc', 'cyclic', [[19, 1]], 'The rotations of a regular 19-sided polygon. There is one of these groups for every prime number.'),
 
   g('A5', 'A₅', 'Alternating group A₅', 'alt', 'alternating', [[2, 2], [3, 1], [5, 1]], 'The 60 rotations of an icosahedron. It is the smallest simple group that is not cyclic.'),
   g('A6', 'A₆', 'Alternating group A₆', 'alt', 'alternating', [[2, 3], [3, 2], [5, 1]], evenShuffles(6) + ' It sits inside S₆, the only symmetric group with an outer automorphism.'),
@@ -295,8 +299,6 @@ const GROUPS = [
   g('A12', 'A₁₂', 'Alternating group A₁₂', 'alt', 'alternating', [[2, 9], [3, 5], [5, 2], [7, 1], [11, 1]], evenShuffles(12) + ' The sporadic group M₁₂ sits inside it.'),
   g('A13', 'A₁₃', 'Alternating group A₁₃', 'alt', 'alternating', [[2, 9], [3, 5], [5, 2], [7, 1], [11, 1], [13, 1]], evenShuffles(13)),
   g('A14', 'A₁₄', 'Alternating group A₁₄', 'alt', 'alternating', [[2, 10], [3, 5], [5, 2], [7, 2], [11, 1], [13, 1]], evenShuffles(14)),
-  g('A15', 'A₁₅', 'Alternating group A₁₅', 'alt', 'alternating', [[2, 10], [3, 6], [5, 3], [7, 2], [11, 1], [13, 1]], evenShuffles(15)),
-  g('A16', 'A₁₆', 'Alternating group A₁₆', 'alt', 'alternating', [[2, 14], [3, 6], [5, 3], [7, 2], [11, 1], [13, 1]], evenShuffles(16)),
 
   g('L2_7', 'PSL(2,7)', 'Linear group PSL(2, 7)', 'lie', 'linear', [[2, 3], [3, 1], [7, 1]], 'Also known as PSL(3, 2): the 168 symmetries of the Fano plane, the smallest projective plane, where any two points share exactly one line and any two lines meet in exactly one point.'),
   g('L2_8', 'PSL(2,8)', 'Linear group PSL(2, 8)', 'lie', 'linear', [[2, 3], [3, 2], [7, 1]], psl2(8, ' Finite fields exist for every prime power, and 8 = 2³.')),
@@ -426,7 +428,7 @@ function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; l
 const POOL = GROUPS.filter((x) => x.kind !== 'cyc').map((x) => x.id);
 const ORDER = (() => { const r = rng(20261027), a = POOL.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
 
-// Puzzles 1 and 2 went out before the table grew from 72 to 96 groups, so they keep their original answers.
+// Puzzles 1 and 2 went out before the group list changed, so they keep their original answers.
 const EARLY_ANSWERS = ['A6', 'L2_8'];
 const dailyAnswer = () => (game.day < EARLY_ANSWERS.length ? EARLY_ANSWERS[game.day] : ORDER[(game.day - EARLY_ANSWERS.length) % ORDER.length]);
 const game = { mode: 'daily', day: todayIndex(), answer: null, guesses: [], selected: null, fresh: null };
@@ -724,8 +726,8 @@ setInterval(() => {
 const LEAN_BASE = 'https://github.com/AxiomMath/CFSG/blob/69cb972f587a3ecc035e092253167ff2e303c962';
 const LEAN = {};
 const leanFor = (ids, path, line, what) => ids.forEach((id) => { LEAN[id] = { path, line, what }; });
-leanFor(['Z2', 'Z3', 'Z5', 'Z7'], 'CFSG/Milestones/CAT_native_realization.lean', 34, 'the theorem that ℤ/p is simple for every prime p');
-leanFor(['A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16'], 'CFSG/Milestones/CAT_native_realization.lean', 39, 'the theorem that Aₙ is simple for n ≥ 5');
+leanFor(['Z2', 'Z3', 'Z5', 'Z7', 'Z11', 'Z13', 'Z17', 'Z19'], 'CFSG/Milestones/CAT_native_realization.lean', 34, 'the theorem that ℤ/p is simple for every prime p');
+leanFor(['A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14'], 'CFSG/Milestones/CAT_native_realization.lean', 39, 'the theorem that Aₙ is simple for n ≥ 5');
 leanFor(['L2_7', 'L2_8', 'L2_11', 'L2_13', 'L2_16', 'L2_17', 'L2_19', 'L2_23', 'L2_25', 'L2_27', 'L2_29', 'L2_31', 'L2_32', 'L2_37', 'L2_41', 'L2_49', 'L3_3', 'L3_4', 'L3_5', 'L3_7', 'L3_8', 'L3_9'], 'CFSG/LieType/Simplicity/Classical.lean', 17, 'the simplicity theorem for PSL(n, q)');
 leanFor(['U3_3', 'U3_4', 'U3_5', 'U3_7', 'U3_8', 'U4_2'], 'CFSG/ClassicalGroups/Unitary/Simple.lean', 166, 'the simplicity theorem for PSU(n, q)');
 leanFor(['S6_2', 'S4_4', 'S4_5', 'S4_7', 'S6_3'], 'CFSG/ClassicalGroups/Symplectic/Simple.lean', 610, 'the simplicity theorem for PSp(2n, q)');
