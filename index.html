@@ -93,7 +93,6 @@
   .tile small { display: none; font: 600 12px var(--sans); margin-right: 5px; opacity: 0.75; }
   .tile.hit { background: var(--hit); color: var(--on-hit); }
   .tile.near { background: var(--near); color: var(--on-near); }
-  .tile.more { background: transparent; color: var(--muted); box-shadow: inset 0 0 0 1px var(--rule-strong); }
   /* Prime factors take a second line under the kind, family and order clues. */
   .primes { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
   @media (max-width: 620px) {
@@ -241,10 +240,9 @@
         <p>Each guess compares your group with the answer. You get 6 guesses, and a new puzzle starts at midnight.</p>
         <div class="example" id="example"></div>
         <div class="legend">
-          <div><span class="sw" style="background: var(--hit)"></span>Matches the answer.</div>
-          <div><span class="sw" style="background: var(--near)"></span>Close. For the order, within a factor of 10. For a prime, the answer has it with a different power; the arrow says which way.</div>
+          <div><span class="sw" style="background: var(--hit)"></span>Matches the answer. For a prime, the answer's order is also divisible by it.</div>
+          <div><span class="sw" style="background: var(--near)"></span>Close: the answer's order is within a factor of 10 of yours.</div>
           <div><span class="sw" style="background: var(--miss)"></span>Does not match. An arrow on the order says whether the answer is bigger or smaller.</div>
-          <div><span class="sw" style="border: 1px dashed var(--muted)"></span>How many primes in the answer's order your guess did not have.</div>
         </div>
         <p>A clue about primes: every simple group that is not cyclic has an even order (Feit and Thompson, 1963, in a 255-page proof) and at least three different primes in its order (Burnside, 1904).</p>
       </div>
@@ -286,6 +284,10 @@ const GROUPS = [
   g('A10', 'A₁₀', 'Alternating group A₁₀', 'alt', 'alternating', [[2, 7], [3, 4], [5, 2], [7, 1]], evenShuffles(10)),
   g('A11', 'A₁₁', 'Alternating group A₁₁', 'alt', 'alternating', [[2, 7], [3, 4], [5, 2], [7, 1], [11, 1]], evenShuffles(11) + ' The sporadic group M₁₁ sits inside it.'),
   g('A12', 'A₁₂', 'Alternating group A₁₂', 'alt', 'alternating', [[2, 9], [3, 5], [5, 2], [7, 1], [11, 1]], evenShuffles(12) + ' The sporadic group M₁₂ sits inside it.'),
+  g('A13', 'A₁₃', 'Alternating group A₁₃', 'alt', 'alternating', [[2, 9], [3, 5], [5, 2], [7, 1], [11, 1], [13, 1]], evenShuffles(13)),
+  g('A14', 'A₁₄', 'Alternating group A₁₄', 'alt', 'alternating', [[2, 10], [3, 5], [5, 2], [7, 2], [11, 1], [13, 1]], evenShuffles(14)),
+  g('A15', 'A₁₅', 'Alternating group A₁₅', 'alt', 'alternating', [[2, 10], [3, 6], [5, 3], [7, 2], [11, 1], [13, 1]], evenShuffles(15)),
+  g('A16', 'A₁₆', 'Alternating group A₁₆', 'alt', 'alternating', [[2, 14], [3, 6], [5, 3], [7, 2], [11, 1], [13, 1]], evenShuffles(16)),
 
   g('L2_7', 'PSL(2,7)', 'Linear group PSL(2, 7)', 'lie', 'linear', [[2, 3], [3, 1], [7, 1]], 'Also known as PSL(3, 2): the 168 symmetries of the Fano plane, the smallest projective plane, where any two points share exactly one line and any two lines meet in exactly one point.'),
   g('L2_8', 'PSL(2,8)', 'Linear group PSL(2, 8)', 'lie', 'linear', [[2, 3], [3, 2], [7, 1]], psl2(8, ' Finite fields exist for every prime power, and 8 = 2³.')),
@@ -297,20 +299,37 @@ const GROUPS = [
   g('L2_23', 'PSL(2,23)', 'Linear group PSL(2, 23)', 'lie', 'linear', [[2, 3], [3, 1], [11, 1], [23, 1]], psl2(23)),
   g('L2_25', 'PSL(2,25)', 'Linear group PSL(2, 25)', 'lie', 'linear', [[2, 3], [3, 1], [5, 2], [13, 1]], psl2(25, ' Here 25 = 5², so the field is not the integers modulo a prime.')),
   g('L2_27', 'PSL(2,27)', 'Linear group PSL(2, 27)', 'lie', 'linear', [[2, 2], [3, 3], [7, 1], [13, 1]], psl2(27, ' Here 27 = 3³.')),
+  g('L2_29', 'PSL(2,29)', 'Linear group PSL(2, 29)', 'lie', 'linear', [[2, 2], [3, 1], [5, 1], [7, 1], [29, 1]], psl2(29)),
+  g('L2_31', 'PSL(2,31)', 'Linear group PSL(2, 31)', 'lie', 'linear', [[2, 5], [3, 1], [5, 1], [31, 1]], psl2(31)),
+  g('L2_32', 'PSL(2,32)', 'Linear group PSL(2, 32)', 'lie', 'linear', [[2, 5], [3, 1], [11, 1], [31, 1]], psl2(32, ' Here 32 = 2⁵.')),
+  g('L2_37', 'PSL(2,37)', 'Linear group PSL(2, 37)', 'lie', 'linear', [[2, 2], [3, 2], [19, 1], [37, 1]], psl2(37)),
+  g('L2_41', 'PSL(2,41)', 'Linear group PSL(2, 41)', 'lie', 'linear', [[2, 3], [3, 1], [5, 1], [7, 1], [41, 1]], psl2(41)),
+  g('L2_49', 'PSL(2,49)', 'Linear group PSL(2, 49)', 'lie', 'linear', [[2, 4], [3, 1], [5, 2], [7, 2]], psl2(49, ' Here 49 = 7², so the field is not the integers modulo a prime.')),
   g('L3_3', 'PSL(3,3)', 'Linear group PSL(3, 3)', 'lie', 'linear', [[2, 4], [3, 3], [13, 1]], '3 × 3 matrices of determinant 1 over the field with 3 elements. They permute the 13 points of a finite projective plane.'),
   g('L3_4', 'PSL(3,4)', 'Linear group PSL(3, 4)', 'lie', 'linear', [[2, 6], [3, 2], [5, 1], [7, 1]], 'It has the same order as A₈, 20,160, but it is a different group. They are the smallest pair of simple groups that share an order.'),
   g('L3_5', 'PSL(3,5)', 'Linear group PSL(3, 5)', 'lie', 'linear', [[2, 5], [3, 1], [5, 3], [31, 1]], 'The symmetries of the projective plane over the field with 5 elements. That plane has 31 points, and 31 divides the order.'),
+  g('L3_7', 'PSL(3,7)', 'Linear group PSL(3, 7)', 'lie', 'linear', [[2, 5], [3, 2], [7, 3], [19, 1]], '3 × 3 matrices of determinant 1 over the field with 7 elements, modulo scalars. They move the 57 points of a projective plane.'),
+  g('L3_8', 'PSL(3,8)', 'Linear group PSL(3, 8)', 'lie', 'linear', [[2, 9], [3, 2], [7, 2], [73, 1]], '3 × 3 matrices of determinant 1 over the field with 8 elements, modulo scalars. They move the 73 points of a projective plane.'),
+  g('L3_9', 'PSL(3,9)', 'Linear group PSL(3, 9)', 'lie', 'linear', [[2, 7], [3, 6], [5, 1], [7, 1], [13, 1]], '3 × 3 matrices of determinant 1 over the field with 9 elements, modulo scalars. They move the 91 points of a projective plane.'),
   g('U3_3', 'PSU(3,3)', 'Unitary group PSU(3, 3)', 'lie', 'unitary', [[2, 5], [3, 3], [7, 1]], 'Unitary groups preserve a finite version of length in complex space. This one uses 3 × 3 matrices over the field with 9 elements.'),
   g('U3_4', 'PSU(3,4)', 'Unitary group PSU(3, 4)', 'lie', 'unitary', [[2, 6], [3, 1], [5, 2], [13, 1]], 'Unitary 3 × 3 matrices over the field with 16 elements.'),
   g('U3_5', 'PSU(3,5)', 'Unitary group PSU(3, 5)', 'lie', 'unitary', [[2, 4], [3, 2], [5, 3], [7, 1]], 'Unitary 3 × 3 matrices over the field with 25 elements.'),
+  g('U3_7', 'PSU(3,7)', 'Unitary group PSU(3, 7)', 'lie', 'unitary', [[2, 7], [3, 1], [7, 3], [43, 1]], 'Unitary 3 × 3 matrices over the field with 49 elements.'),
+  g('U3_8', 'PSU(3,8)', 'Unitary group PSU(3, 8)', 'lie', 'unitary', [[2, 9], [3, 4], [7, 1], [19, 1]], 'Unitary 3 × 3 matrices over the field with 64 elements.'),
   g('U4_2', 'PSU(4,2)', 'Unitary group PSU(4, 2)', 'lie', 'unitary', [[2, 6], [3, 4], [5, 1]], 'A group twice its size, of order 51,840, is the symmetry group of the 27 straight lines on a smooth cubic surface.'),
   g('S6_2', 'PSp(6,2)', 'Symplectic group PSp(6, 2)', 'lie', 'symplectic', [[2, 9], [3, 4], [5, 1], [7, 1]], 'The symmetry group of the 28 lines that touch a smooth plane quartic curve at two points each.'),
   g('S4_4', 'PSp(4,4)', 'Symplectic group PSp(4, 4)', 'lie', 'symplectic', [[2, 8], [3, 2], [5, 2], [17, 1]], 'Symplectic groups preserve the structure that pairs position with momentum in mechanics. This one uses 4 × 4 matrices over the field with 4 elements.'),
-  g('O7_3', 'Ω(7,3)', 'Orthogonal group Ω(7, 3)', 'lie', 'orthogonal', [[2, 9], [3, 9], [5, 1], [7, 1], [13, 1]], 'A finite version of the rotation group in 7 dimensions, built over the field with 3 elements.'),
+  g('S4_5', 'PSp(4,5)', 'Symplectic group PSp(4, 5)', 'lie', 'symplectic', [[2, 6], [3, 2], [5, 4], [13, 1]], 'Symplectic 4 × 4 matrices over the field with 5 elements, modulo ±1.'),
+  g('S4_7', 'PSp(4,7)', 'Symplectic group PSp(4, 7)', 'lie', 'symplectic', [[2, 8], [3, 2], [5, 2], [7, 4]], 'Symplectic 4 × 4 matrices over the field with 7 elements, modulo ±1.'),
+  g('S6_3', 'PSp(6,3)', 'Symplectic group PSp(6, 3)', 'lie', 'symplectic', [[2, 9], [3, 9], [5, 1], [7, 1], [13, 1]], 'It has the same order as Ω(7, 3), 4,585,351,680, but it is a different group. Apart from A₈ and PSL(3, 4), every pair of simple groups with the same order is of this kind: Bₙ(q) and Cₙ(q) for n ≥ 3 and odd q.'),
+  g('O7_3', 'Ω(7,3)', 'Orthogonal group Ω(7, 3)', 'lie', 'orthogonal', [[2, 9], [3, 9], [5, 1], [7, 1], [13, 1]], 'A finite version of the rotation group in 7 dimensions, built over the field with 3 elements. It has the same order as PSp(6, 3) but is a different group.'),
   g('O8p_2', 'Ω⁺(8,2)', 'Orthogonal group Ω⁺(8, 2)', 'lie', 'orthogonal', [[2, 12], [3, 5], [5, 2], [7, 1]], 'A finite version of the rotation group in 8 dimensions, built over the field with 2 elements. It has an extra symmetry of order 3 called triality.'),
   g('O8m_2', 'Ω⁻(8,2)', 'Orthogonal group Ω⁻(8, 2)', 'lie', 'orthogonal', [[2, 12], [3, 4], [5, 1], [7, 1], [17, 1]], 'A twisted version of the rotation group in 8 dimensions, built over the field with 2 elements.'),
+  g('O8p_3', 'Ω⁺(8,3)', 'Orthogonal group Ω⁺(8, 3)', 'lie', 'orthogonal', [[2, 12], [3, 12], [5, 2], [7, 1], [13, 1]], 'A finite version of the rotation group in 8 dimensions, built over the field with 3 elements. Like Ω⁺(8, 2), it has the extra symmetry called triality.'),
+  g('O8m_3', 'Ω⁻(8,3)', 'Orthogonal group Ω⁻(8, 3)', 'lie', 'orthogonal', [[2, 10], [3, 12], [5, 1], [7, 1], [13, 1], [41, 1]], 'A twisted version of the rotation group in 8 dimensions, built over the field with 3 elements.'),
   g('G2_3', 'G₂(3)', 'Exceptional group G₂(3)', 'lie', 'exceptional', [[2, 6], [3, 6], [7, 1], [13, 1]], 'G₂ groups are the symmetries of octonions built over finite fields. The octonions are an 8-dimensional number system.'),
   g('G2_4', 'G₂(4)', 'Exceptional group G₂(4)', 'lie', 'exceptional', [[2, 12], [3, 3], [5, 2], [7, 1], [13, 1]], 'It contains the sporadic group J₂.'),
+  g('G2_5', 'G₂(5)', 'Exceptional group G₂(5)', 'lie', 'exceptional', [[2, 6], [3, 3], [5, 6], [7, 1], [31, 1]], 'G₂ over the field with 5 elements. Like every G₂ group, it is a symmetry group of octonions built over a finite field.'),
   g('3D4_2', '³D₄(2)', 'Triality group ³D₄(2)', 'lie', 'exceptional', [[2, 12], [3, 4], [7, 2], [13, 1]], 'Built from the threefold symmetry of the D₄ diagram. No other diagram of its kind has that symmetry.'),
   g('F4_2', 'F₄(2)', 'Exceptional group F₄(2)', 'lie', 'exceptional', [[2, 24], [3, 6], [5, 2], [7, 2], [13, 1], [17, 1]], 'F₄ groups are finite versions of the symmetries of the Albert algebra, built from 3 × 3 self-adjoint matrices of octonions.'),
   g('E6_2', 'E₆(2)', 'Exceptional group E₆(2)', 'lie', 'exceptional', [[2, 36], [3, 6], [5, 2], [7, 3], [13, 1], [17, 1], [31, 1], [73, 1]], 'A finite version of E₆, a 78-dimensional continuous symmetry group.'),
@@ -319,8 +338,11 @@ const GROUPS = [
   g('E8_2', 'E₈(2)', 'Exceptional group E₈(2)', 'lie', 'exceptional', [[2, 120], [3, 13], [5, 5], [7, 4], [11, 2], [13, 2], [17, 2], [19, 1], [31, 2], [41, 1], [43, 1], [73, 1], [127, 1], [151, 1], [241, 1], [331, 1]], 'A finite version of E₈, a 248-dimensional continuous symmetry group. Its order has 75 digits, far more than the Monster’s 54.'),
   g('Sz8', 'Sz(8)', 'Suzuki group Sz(8)', 'lie', 'suzree', [[2, 6], [5, 1], [7, 1], [13, 1]], 'Suzuki groups are the only non-cyclic simple groups whose order is not divisible by 3.'),
   g('Sz32', 'Sz(32)', 'Suzuki group Sz(32)', 'lie', 'suzree', [[2, 10], [5, 2], [31, 1], [41, 1]], 'Michio Suzuki found this family in 1960.'),
+  g('Sz128', 'Sz(128)', 'Suzuki group Sz(128)', 'lie', 'suzree', [[2, 14], [5, 1], [29, 1], [113, 1], [127, 1]], 'The Suzuki group over the field with 128 = 2⁷ elements. Like every Suzuki group, its order is not divisible by 3.'),
   g('R27', '²G₂(27)', 'Ree group ²G₂(27)', 'lie', 'suzree', [[2, 3], [3, 9], [7, 1], [13, 1], [19, 1], [37, 1]], 'Rimhak Ree found this family in 1960.'),
+  g('R243', '²G₂(243)', 'Ree group ²G₂(243)', 'lie', 'suzree', [[2, 3], [3, 15], [7, 1], [11, 2], [31, 1], [61, 1], [271, 1]], 'A Ree group over the field with 243 = 3⁵ elements.'),
   g('Tits', '²F₄(2)′', 'Tits group ²F₄(2)′', 'lie', 'suzree', [[2, 11], [3, 3], [5, 2], [13, 1]], 'Jacques Tits found it in 1964. It is so unusual that some authors count it as a 27th sporadic group.'),
+  g('2F4_8', '²F₄(8)', 'Ree group ²F₄(8)', 'lie', 'suzree', [[2, 36], [3, 5], [5, 2], [7, 2], [13, 2], [19, 1], [37, 1], [109, 1]], 'A Ree group of type F₄, over the field with 8 elements. Rimhak Ree found this family in 1961.'),
 
   g('M11', 'M₁₁', 'Mathieu group M₁₁', 'spor', 'mathieu', [[2, 4], [3, 2], [5, 1], [11, 1]], 'The smallest sporadic group. Émile Mathieu found it in 1861.'),
   g('M12', 'M₁₂', 'Mathieu group M₁₂', 'spor', 'mathieu', [[2, 6], [3, 3], [5, 1], [11, 1]], 'It shuffles 12 points so evenly that any 5 of them can be sent to any other 5, in any chosen order, in exactly one way.'),
@@ -390,22 +412,25 @@ function todayIndex() {
   const now = new Date(), t = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.max(0, Math.round((t - START) / 86400000));
 }
-// A fixed shuffle of the answer pool, so each day has its own group and none repeats for 68 days.
+// A fixed shuffle of the answer pool, so each day has its own group and none repeats until the pool runs out.
 function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const POOL = GROUPS.filter((x) => x.kind !== 'cyc').map((x) => x.id);
 const ORDER = (() => { const r = rng(20261027), a = POOL.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
 
+// Puzzles 1 and 2 went out before the table grew from 72 to 96 groups, so they keep their original answers.
+const EARLY_ANSWERS = ['A6', 'L2_8'];
+const dailyAnswer = () => (game.day < EARLY_ANSWERS.length ? EARLY_ANSWERS[game.day] : ORDER[(game.day - EARLY_ANSWERS.length) % ORDER.length]);
 const game = { mode: 'daily', day: todayIndex(), answer: null, guesses: [], selected: null, fresh: null };
 function loadDaily() {
   game.mode = 'daily';
-  game.answer = ORDER[game.day % ORDER.length];
+  game.answer = dailyAnswer();
   game.guesses = store.get(`dsg:day:${game.day}`, []).filter((id) => BY_ID[id]);
   game.selected = null;
 }
 function newPractice() {
   game.mode = 'practice';
   let a;
-  do { a = POOL[Math.floor(Math.random() * POOL.length)]; } while (a === ORDER[game.day % ORDER.length] || a === game.answer);
+  do { a = POOL[Math.floor(Math.random() * POOL.length)]; } while (a === dailyAnswer() || a === game.answer);
   game.answer = a; game.guesses = []; game.selected = null;
 }
 const solved = () => game.guesses.includes(game.answer);
@@ -423,16 +448,11 @@ function compare(guess, answer) {
     const [hi, lo] = A.order > G.order ? [A.order, G.order] : [G.order, A.order];
     if (hi <= lo * 10n) order = 'near';
   }
-  const target = Object.fromEntries(A.f);
-  const primes = G.f.map(([p, e]) => {
-    const te = target[p];
-    if (te === e) return { text: pp([p, e]), state: 'hit' };
-    if (te) return { text: pp([p, e]) + (te > e ? '↑' : '↓'), state: 'near' };
-    return { text: pp([p, e]), state: 'miss' };
-  });
-  const guessPrimes = new Set(G.f.map(([p]) => p));
-  const extra = A.f.filter(([p]) => !guessPrimes.has(p)).length;
-  return { kind, fam, order, dir, primes, extra };
+  // Each prime in the guess's order only says whether the answer's order has it too. Powers and the answer's other
+  // primes stay hidden; with them the factorization identified the answer almost at once.
+  const answerPrimes = new Set(A.f.map(([p]) => p));
+  const primes = G.f.map(([p]) => ({ text: String(p), state: answerPrimes.has(p) ? 'hit' : 'miss' }));
+  return { kind, fam, order, dir, primes };
 }
 
 // ------------------------------------------------------------------ rendering
@@ -448,7 +468,6 @@ function guessRow(id, answer, tag) {
   const G = BY_ID[id], c = compare(id, answer), row = el(tag, 'grow guess');
   const primes = el('span', 'primes');
   c.primes.forEach((p) => primes.appendChild(tile(p.state, null, p.text)));
-  if (c.extra) { const m = tile('more', null, `+${c.extra}`); m.title = `The answer's order has ${c.extra} more prime${c.extra > 1 ? 's' : ''}`; primes.appendChild(m); }
   row.append(el('span', 'gsym', G.sym), tile(c.kind, 'Kind', KINDS[G.kind].label), tile(c.fam, 'Family', FAMS[G.fam]), tile(c.order, 'Order', `${shortOrder(G.order)} ${c.dir}`.trim()), primes);
   return row;
 }
@@ -692,22 +711,22 @@ const LEAN_BASE = 'https://github.com/AxiomMath/CFSG/blob/69cb972f587a3ecc035e09
 const LEAN = {};
 const leanFor = (ids, path, line, what) => ids.forEach((id) => { LEAN[id] = { path, line, what }; });
 leanFor(['Z2', 'Z3', 'Z5', 'Z7'], 'CFSG/Milestones/CAT_native_realization.lean', 34, 'the theorem that ℤ/p is simple for every prime p');
-leanFor(['A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12'], 'CFSG/Milestones/CAT_native_realization.lean', 39, 'the theorem that Aₙ is simple for n ≥ 5');
-leanFor(['L2_7', 'L2_8', 'L2_11', 'L2_13', 'L2_16', 'L2_17', 'L2_19', 'L2_23', 'L2_25', 'L2_27', 'L3_3', 'L3_4', 'L3_5'], 'CFSG/LieType/Simplicity/Classical.lean', 17, 'the simplicity theorem for PSL(n, q)');
-leanFor(['U3_3', 'U3_4', 'U3_5', 'U4_2'], 'CFSG/ClassicalGroups/Unitary/Simple.lean', 166, 'the simplicity theorem for PSU(n, q)');
-leanFor(['S6_2', 'S4_4'], 'CFSG/ClassicalGroups/Symplectic/Simple.lean', 610, 'the simplicity theorem for PSp(2n, q)');
+leanFor(['A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12', 'A13', 'A14', 'A15', 'A16'], 'CFSG/Milestones/CAT_native_realization.lean', 39, 'the theorem that Aₙ is simple for n ≥ 5');
+leanFor(['L2_7', 'L2_8', 'L2_11', 'L2_13', 'L2_16', 'L2_17', 'L2_19', 'L2_23', 'L2_25', 'L2_27', 'L2_29', 'L2_31', 'L2_32', 'L2_37', 'L2_41', 'L2_49', 'L3_3', 'L3_4', 'L3_5', 'L3_7', 'L3_8', 'L3_9'], 'CFSG/LieType/Simplicity/Classical.lean', 17, 'the simplicity theorem for PSL(n, q)');
+leanFor(['U3_3', 'U3_4', 'U3_5', 'U3_7', 'U3_8', 'U4_2'], 'CFSG/ClassicalGroups/Unitary/Simple.lean', 166, 'the simplicity theorem for PSU(n, q)');
+leanFor(['S6_2', 'S4_4', 'S4_5', 'S4_7', 'S6_3'], 'CFSG/ClassicalGroups/Symplectic/Simple.lean', 610, 'the simplicity theorem for PSp(2n, q)');
 leanFor(['O7_3'], 'CFSG/ClassicalGroups/Orthogonal/Simple.lean', 184, 'the simplicity theorem for Ω(2n + 1, q)');
-leanFor(['O8p_2'], 'CFSG/ClassicalGroups/Orthogonal/Simple.lean', 195, 'the simplicity theorem for Ω⁺(2n, q)');
-leanFor(['O8m_2'], 'CFSG/ClassicalGroups/Orthogonal/Simple.lean', 202, 'the simplicity theorem for Ω⁻(2n, q)');
-leanFor(['G2_3', 'G2_4'], 'CFSG/LieType/Simplicity/Exceptional.lean', 88, 'the simplicity theorem for G₂(q)');
+leanFor(['O8p_2', 'O8p_3'], 'CFSG/ClassicalGroups/Orthogonal/Simple.lean', 195, 'the simplicity theorem for Ω⁺(2n, q)');
+leanFor(['O8m_2', 'O8m_3'], 'CFSG/ClassicalGroups/Orthogonal/Simple.lean', 202, 'the simplicity theorem for Ω⁻(2n, q)');
+leanFor(['G2_3', 'G2_4', 'G2_5'], 'CFSG/LieType/Simplicity/Exceptional.lean', 88, 'the simplicity theorem for G₂(q)');
 leanFor(['3D4_2'], 'CFSG/LieType/Simplicity/TrialityD4.lean', 13, 'the simplicity theorem for ³D₄(q)');
 leanFor(['F4_2'], 'CFSG/LieType/Simplicity/Exceptional.lean', 96, 'the simplicity theorem for F₄(q)');
 leanFor(['E8_2'], 'CFSG/LieType/Simplicity/Exceptional.lean', 103, 'the simplicity theorem for E₈(q)');
 leanFor(['E6_2'], 'CFSG/LieType/Simplicity/Exceptional.lean', 110, 'the simplicity theorem for E₆(q)');
 leanFor(['E7_2'], 'CFSG/LieType/Simplicity/Exceptional.lean', 117, 'the simplicity theorem for E₇(q)');
 leanFor(['2E6_2'], 'CFSG/LieType/Simplicity/Exceptional.lean', 129, 'the simplicity theorem for ²E₆(q)');
-leanFor(['Sz8', 'Sz32'], 'CFSG/LieType/Simplicity/Suzuki.lean', 30, 'the simplicity theorem for the Suzuki groups');
-leanFor(['R27'], 'CFSG/LieType/Simplicity/ReeSmall.lean', 514, 'the simplicity theorem for the Ree groups ²G₂(q)');
+leanFor(['Sz8', 'Sz32', 'Sz128'], 'CFSG/LieType/Simplicity/Suzuki.lean', 30, 'the simplicity theorem for the Suzuki groups');
+leanFor(['R27', 'R243'], 'CFSG/LieType/Simplicity/ReeSmall.lean', 514, 'the simplicity theorem for the Ree groups ²G₂(q)');
 leanFor(['Tits'], 'CFSG/LieType/Simplicity/TitsModel.lean', 97, 'the theorem that the Tits group is simple');
 for (const [id, path, line] of [
   ['M11', 'CFSG/Sporadic/Mathieu/M11.lean', 41], ['M12', 'CFSG/Sporadic/Mathieu/M12.lean', 43], ['M22', 'CFSG/Sporadic/Mathieu/M22.lean', 44],
@@ -881,8 +900,14 @@ function makeField(q) {
   for (let t = q; t > 1; t /= p) k++;
   const digits = (v) => { const d = []; for (let i = 0; i < k; i++) { d.push(v % p); v = Math.floor(v / p); } return d; };
   const undigits = (d) => d.reduceRight((acc, x) => acc * p + x, 0);
-  const add = (a, b) => { const y = digits(b); return undigits(digits(a).map((v, i) => (v + y[i]) % p)); };
-  const neg = (a) => undigits(digits(a).map((v) => (p - v) % p));
+  // Addition and negation are precomputed as tables, since the unital and symplectic pictures call them millions of times.
+  const addTable = new Uint16Array(q * q), negTable = new Uint16Array(q);
+  for (let a = 0; a < q; a++) {
+    negTable[a] = undigits(digits(a).map((v) => (p - v) % p));
+    for (let b = 0; b < q; b++) { const y = digits(b); addTable[a * q + b] = undigits(digits(a).map((v, i) => (v + y[i]) % p)); }
+  }
+  const add = (a, b) => addTable[a * q + b];
+  const neg = (a) => negTable[a];
   for (let c = 1; c < q; c++) {
     const cd = digits(c);
     // Multiply by x modulo the monic polynomial x^k + c_{k-1} x^{k-1} + ... + c_0.
@@ -1003,7 +1028,7 @@ function planeScene(q) {
 }
 function unitalScene(q) {
   const { v, blocks } = unitalBlocks(q);
-  return designScene(v, blocks, `The Hermitian unital: ${v} points in the projective plane over the field with ${q * q} elements. Lines that meet it in more than one point cut it into ${blocks.length} groups of ${q + 1}, and any two of its points lie in exactly one group. PSU(3, ${q}) moves the points so that every group lands on a group.`);
+  return designScene(v, blocks, `The Hermitian unital: ${v} points in the projective plane over the field with ${q * q} elements. Lines that meet it in more than one point cut it into ${blocks.length.toLocaleString('en-US')} groups of ${q + 1}, and any two of its points lie in exactly one group. PSU(3, ${q}) moves the points so that every group lands on a group.`);
 }
 function cubicScene() {
   const { v, blocks, labels } = cubicSurfaceLines();
@@ -1012,7 +1037,7 @@ function cubicScene() {
 function symplecticScene(q, n, note) {
   const { v, blocks } = symplecticLines(q, n);
   const perPoint = (blocks.length * (q + 1)) / v;
-  return designScene(v, blocks, `The ${v} points of projective ${n - 1}-space over the field with ${q} elements, and the ${blocks.length} lines of ${q + 1} points on which a fixed symplectic form is zero. Every point lies on ${perPoint} of the lines. ${note}`, { noun: 'line' });
+  return designScene(v, blocks, `The ${v} points of projective ${n - 1}-space over the field with ${q} elements, and the ${blocks.length.toLocaleString('en-US')} lines of ${q + 1} points on which a fixed symplectic form is zero. Every point lies on ${perPoint} of the lines. ${note}`, { noun: 'line' });
 }
 
 function projectiveScene(q) {
@@ -1170,6 +1195,9 @@ const LIE_PICTURES = {
   O8m_2: ['D4', [[2, 3]], 'Ω⁻(8, 2), also written ²D₄(2), is built from D₄ over the field with 4 elements, using the flip of the diagram shown dashed.'],
   G2_3: ['G2', null, 'G₂(3) is the group of type G₂ over the field with 3 elements. Long roots are drawn larger than short ones.'],
   G2_4: ['G2', null, 'G₂(4) is the group of type G₂ over the field with 4 elements. Long roots are drawn larger than short ones.'],
+  O8p_3: ['D4', null, 'Ω⁺(8, 3) is the group of type D₄ over the field with 3 elements. The D₄ diagram is the only one with a threefold symmetry, called triality.'],
+  O8m_3: ['D4', [[2, 3]], 'Ω⁻(8, 3), also written ²D₄(3), is built from D₄ over the field with 9 elements, using the flip of the diagram shown dashed.'],
+  G2_5: ['G2', null, 'G₂(5) is the group of type G₂ over the field with 5 elements. Long roots are drawn larger than short ones.'],
   '3D4_2': ['D4', [[0, 2, 3]], '³D₄(2) is built from D₄ over the field with 8 elements, using the threefold rotation of the diagram shown dashed.'],
   F4_2: ['F4', null, 'F₄(2) is the group of type F₄ over the field with 2 elements. Long roots are drawn larger than short ones.'],
   E6_2: ['E6', null, 'E₆(2) is the group of type E₆ over the field with 2 elements.'],
@@ -1178,6 +1206,9 @@ const LIE_PICTURES = {
   E8_2: ['E8', null, 'E₈(2) is the group of type E₈ over the field with 2 elements.'],
   Sz8: ['B2', [[0, 1]], 'Suzuki groups are built from B₂ with a twist that swaps long and short roots, shown dashed. It only works over fields with 2, 8, 32, … elements, and Sz(8) uses the field with 8.'],
   Sz32: ['B2', [[0, 1]], 'Suzuki groups are built from B₂ with a twist that swaps long and short roots, shown dashed. It only works over fields with 2, 8, 32, … elements, and Sz(32) uses the field with 32.'],
+  Sz128: ['B2', [[0, 1]], 'Suzuki groups are built from B₂ with a twist that swaps long and short roots, shown dashed. It only works over fields with 2, 8, 32, … elements, and Sz(128) uses the field with 128.'],
+  R243: ['G2', [[0, 1]], 'Ree groups of this kind are built from G₂ with a twist that swaps long and short roots, shown dashed. It only works over fields with 3, 27, 243, … elements, and ²G₂(243) uses the field with 243.'],
+  '2F4_8': ['F4', [[0, 3], [1, 2]], 'Ree groups of type F₄ are built from F₄ with a twist that swaps long and short roots, shown dashed. It only works over fields with 2, 8, 32, … elements, and ²F₄(8) uses the field with 8.'],
   R27: ['G2', [[0, 1]], 'Ree groups of this kind are built from G₂ with a twist that swaps long and short roots, shown dashed. It only works over fields with 3, 27, 243, … elements, and ²G₂(27) uses the field with 27.'],
   Tits: ['F4', [[0, 3], [1, 2]], 'The Tits group is a subgroup of index 2 in ²F₄(2), which is built from F₄ with a twist that swaps long and short roots, shown dashed, over the field with 2 elements.'],
 };
@@ -1288,7 +1319,7 @@ function sceneFor(x) {
   if ((m = /^U3_(\d+)$/.exec(x.id))) return unitalScene(Number(m[1]));
   if (x.id === 'U4_2') return cubicScene();
   if (x.id === 'S6_2') return symplecticScene(2, 6, 'PSp(6, 2) is the full symmetry group of this pattern.');
-  if (x.id === 'S4_4') return symplecticScene(4, 4, 'PSp(4, 4) moves the points so that every line lands on a line.');
+  if ((m = /^S(\d)_(\d+)$/.exec(x.id))) return symplecticScene(Number(m[2]), Number(m[1]), `PSp(${m[1]}, ${m[2]}) moves the points so that every line lands on a line.`);
   if (LIE_PICTURES[x.id]) return rootScene(...LIE_PICTURES[x.id]);
   if (STEINER[x.id]) return steinerScene(x.id);
   if (['Co1', 'Co2', 'Co3'].includes(x.id)) return packingScene();
@@ -1377,7 +1408,7 @@ document.getElementById('modeBtn').addEventListener('click', () => { if (game.mo
 {
   // A worked example: guessing A₇ when the answer is M₁₁.
   const ex = document.getElementById('example');
-  ex.append(headerRow(), guessRow('A7', 'M11', 'div'), el('p', null, 'If you guess A₇ and the answer is M₁₁, you learn that the answer is not alternating. Its order is bigger, but by less than a factor of 10. It has 3² and 5 exactly, a higher power of 2, no 7, and one prime that A₇ does not have.'));
+  ex.append(headerRow(), guessRow('A7', 'M11', 'div'), el('p', null, 'If you guess A₇ and the answer is M₁₁, you learn that the answer is not alternating. Its order is bigger, but by less than a factor of 10. Its order is divisible by 2, 3 and 5, but not by 7.'));
 }
 
 renderTable();
