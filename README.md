@@ -1,6 +1,6 @@
 # Daily Simple Group
 
-A daily puzzle about the Classification of Finite Simple Groups. You have six guesses to find the day's finite simple group, from a table of 98 groups. Each guess is compared with the answer by kind, family and order, and shows which primes in the guess's order also divide the answer's order.
+A daily puzzle about the Classification of Finite Simple Groups. You have six guesses to find the day's finite simple group, from a table of 98 groups. Each guess is compared with the answer by kind, family and order, and by whether the two orders agree on being divisible by 5 and by 7.
 
 The site is the single file `index.html`. It has no build step and loads nothing from other sites. Progress and streaks are stored in the browser's local storage. Each day from October 27, 2026 has its own answer. The first two days are fixed, and later days come from a fixed shuffle of the 90 non-cyclic groups.
 
